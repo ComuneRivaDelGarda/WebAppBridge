@@ -41,7 +41,7 @@ public class Start {
                 .cookieJarEnabled(Boolean.TRUE)                             // la pagina può impostare dei cookie
 
                 .downloadEnabled(Boolean.TRUE)                              // download abilitati
-                .downloadContentTypes(new String[]{"application/pdf"})      // content type permessi al download
+                //.downloadContentTypes(new String[]{"application/pdf"})      // content type permessi al download
                 .downloadPath("/Users/tiziano/Downloads")                   // cartella proposta per il download
 
                 .loadFinishedCallback(callbackClass, "callback()")          // callback da eseguire a pagina caricata
