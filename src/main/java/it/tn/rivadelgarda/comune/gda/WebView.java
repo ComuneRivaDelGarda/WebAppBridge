@@ -64,14 +64,13 @@ public class WebView extends QWebView {
     }
 
     private void downloadRequest(QNetworkRequest request){
+        QNetworkAccessManager manager = page().networkAccessManager();
         if( downloadContentTypes.length>0 ){
-            QNetworkAccessManager manager = page().networkAccessManager();
             QNetworkReply headerReply = manager.head(request);
             headerReply.finished.connect(this, "checkHeaders()");
         } else {
-            QNetworkAccessManager manager = page().networkAccessManager();
             QNetworkReply reply = manager.get(request);
-            downloadFile(reply);
+            reply.finished.connect(this, "downloadFileSlot()");
         }
     }
 
