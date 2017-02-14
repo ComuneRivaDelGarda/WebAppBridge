@@ -112,8 +112,9 @@ public class WebView extends QWebView {
             folderPath = QFileDialog.getExistingDirectory(this, "Save file", null, QFileDialog.Option.ShowDirsOnly);
         }
         if( folderPath!=null ) {
-            // XXX: to catch the correct file name
-            saveFile(folderPath + "/out.pdf", bytes);
+            String[] split = reply.url().toString().split("/");
+            String fileName = split[split.length - 1];
+            saveFile(folderPath + "/" + fileName, bytes);
         } else {
             QMessageBox.critical(this, "Alert", "File not saved");
         }
