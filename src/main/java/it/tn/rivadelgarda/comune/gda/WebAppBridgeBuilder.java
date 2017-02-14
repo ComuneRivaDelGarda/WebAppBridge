@@ -106,7 +106,7 @@ public class WebAppBridgeBuilder {
         if( cookieJarEnabled ){
             bridge.enableCookieJar();
         }
-        if( downloadEnabled && downloadContentTypes.length>0 ){
+        if( downloadEnabled ){
             bridge.enableDownload(downloadContentTypes, downloadPath);
         }
         if (loadFinishedCallbackReceiver != null) {

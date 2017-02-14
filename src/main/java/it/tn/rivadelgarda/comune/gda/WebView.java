@@ -46,10 +46,32 @@ public class WebView extends QWebView {
 
     public void enableDownload(String[] types, String path){
         downloadContentTypes = types;
-        page.setLinkDelegationPolicy(QWebPage.LinkDelegationPolicy.DelegateAllLinks);
-        page.linkClicked.connect(this, "linkFilter(QUrl)");
+        page.downloadRequested.connect(this, "downloadRequest(QNetworkRequest)");
+        if( downloadContentTypes.length>0 ) {
+            page.setLinkDelegationPolicy(QWebPage.LinkDelegationPolicy.DelegateAllLinks);
+            page.linkClicked.connect(this, "linkFilter(QUrl)");
+        } else {
+            page.setForwardUnsupportedContent(true);
+            page.unsupportedContent.connect(this, "unsupportedContent(QNetworkReply)");
+        }
         if( path!=null ){
             downloadPath = path;
+        }
+    }
+
+    private void unsupportedContent(QNetworkReply reply){
+        downloadFile(reply);
+    }
+
+    private void downloadRequest(QNetworkRequest request){
+        if( downloadContentTypes.length>0 ){
+            QNetworkAccessManager manager = page().networkAccessManager();
+            QNetworkReply headerReply = manager.head(request);
+            headerReply.finished.connect(this, "checkHeaders()");
+        } else {
+            QNetworkAccessManager manager = page().networkAccessManager();
+            QNetworkReply reply = manager.get(request);
+            downloadFile(reply);
         }
     }
 
@@ -64,19 +86,25 @@ public class WebView extends QWebView {
         QNetworkReply headerReply = (QNetworkReply) signalSender();
         QUrl url = headerReply.url();
         String contentType = (String) headerReply.header(QNetworkRequest.KnownHeaders.ContentTypeHeader);
-        //if( "application/pdf".equals(contentType) ){
         if( Arrays.asList(downloadContentTypes).contains(contentType) ){
             QNetworkAccessManager manager = headerReply.manager();
             QNetworkRequest request = new QNetworkRequest(url);
             QNetworkReply reply = manager.get(request);
-            reply.finished.connect(this, "downloadFile()");
+            reply.finished.connect(this, "downloadFileSlot()");
         } else {
             setUrl(url);
         }
     }
 
-    private void downloadFile(){
+    private void downloadFileSlot(){
         QNetworkReply reply = (QNetworkReply) signalSender();
+        downloadFile(reply);
+    }
+
+    private void downloadFile(QNetworkReply reply){
+        if( downloadContentTypes.length>0 ){
+
+        }
         byte[] bytes = reply.readAll().toByteArray();
         String folderPath=null;
         if( downloadPath!=null ) {
