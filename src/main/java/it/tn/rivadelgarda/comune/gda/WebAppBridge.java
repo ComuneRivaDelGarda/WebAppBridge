@@ -40,4 +40,11 @@ public class WebAppBridge extends QDialog {
         webView.enableDownload(types, path);
     }
 
+    public void loadFinishedCallback(Object object, String callback){
+        webView.page().loadFinished.connect(object, callback);
+    }
+
+    public WebView getWebView() {
+        return webView;
+    }
 }

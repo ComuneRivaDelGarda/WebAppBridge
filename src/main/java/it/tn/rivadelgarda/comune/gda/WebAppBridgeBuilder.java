@@ -17,6 +17,8 @@ public class WebAppBridgeBuilder {
     private Boolean javaScriptCanAccessClipboard = Boolean.FALSE;
     private Boolean developerExtrasEnabled = Boolean.FALSE;
     private Boolean cookieJarEnabled = Boolean.FALSE;
+    private Object loadFinishedCallbackReceiver = null;
+    private String loadFinishedCallback = null;
 
     public static WebAppBridgeBuilder create() {
         return new WebAppBridgeBuilder();
@@ -72,6 +74,12 @@ public class WebAppBridgeBuilder {
         return this;
     }
 
+    public WebAppBridgeBuilder loadFinishedCallback(Object receiver, String callback){
+        loadFinishedCallbackReceiver = receiver;
+        loadFinishedCallback = callback;
+        return this;
+    }
+
     public WebAppBridge build(){
         WebAppBridge bridge = new WebAppBridge();
         if( bridge!=null ){
@@ -100,6 +108,9 @@ public class WebAppBridgeBuilder {
         }
         if( downloadEnabled && downloadContentTypes.length>0 ){
             bridge.enableDownload(downloadContentTypes, downloadPath);
+        }
+        if (loadFinishedCallbackReceiver != null) {
+            bridge.loadFinishedCallback(loadFinishedCallbackReceiver, loadFinishedCallback);
         }
         return bridge;
     }

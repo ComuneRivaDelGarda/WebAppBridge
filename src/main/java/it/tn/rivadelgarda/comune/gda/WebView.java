@@ -1,7 +1,6 @@
 package it.tn.rivadelgarda.comune.gda;
 
 import com.trolltech.qt.core.QUrl;
-import com.trolltech.qt.gui.QDialog;
 import com.trolltech.qt.gui.QFileDialog;
 import com.trolltech.qt.gui.QMessageBox;
 import com.trolltech.qt.gui.QWidget;
@@ -10,7 +9,6 @@ import com.trolltech.qt.network.QNetworkCookieJar;
 import com.trolltech.qt.network.QNetworkReply;
 import com.trolltech.qt.network.QNetworkRequest;
 import com.trolltech.qt.webkit.QWebPage;
-import com.trolltech.qt.webkit.QWebSettings;
 import com.trolltech.qt.webkit.QWebView;
 
 import java.io.FileNotFoundException;
@@ -104,12 +102,6 @@ public class WebView extends QWebView {
             e.printStackTrace();
         }
     }
-
-    /*
-    private void loadFinished(){
-        // page loaded
-    }
-    */
 
     @Override
     protected QWebView createWindow(QWebPage.WebWindowType type) {
