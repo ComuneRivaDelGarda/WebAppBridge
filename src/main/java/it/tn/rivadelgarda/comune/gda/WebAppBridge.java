@@ -19,19 +19,25 @@ public class WebAppBridge extends QDialog {
 
     public WebAppBridge(QWidget parent) {
         super(parent);
-
         webView = new WebView();
         QVBoxLayout vLayout = new QVBoxLayout(this);
         vLayout.addWidget(webView);
+    }
 
-        webView.settings().setAttribute(QWebSettings.WebAttribute.JavascriptEnabled, true);
-        webView.settings().setAttribute(QWebSettings.WebAttribute.JavascriptCanOpenWindows, true);
-        webView.settings().setAttribute(QWebSettings.WebAttribute.JavascriptCanAccessClipboard, true);
-
+    public void setAttribute(QWebSettings.WebAttribute attribute, Boolean value){
+        webView.settings().setAttribute(attribute, value);
     }
 
     public void loadPage(String url){
         webView.load(new QUrl(url));
+    }
+
+    public void enableCookieJar(){
+        webView.enableCoockieJar();
+    }
+
+    public void enableDownload(String[] types, String path){
+        webView.enableDownload(types, path);
     }
 
 }
