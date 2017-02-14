@@ -14,6 +14,7 @@ public class WebAppBridgeBuilder {
     private Boolean javaScriptEnabled = Boolean.FALSE;
     private Boolean javaScriptCanOpenWindows = Boolean.FALSE;
     private Boolean javaScriptCanCloseWindows = Boolean.FALSE;
+    private Boolean javaScriptCanAccessClipboard = Boolean.FALSE;
     private Boolean developerExtrasEnabled = Boolean.FALSE;
     private Boolean cookieJarEnabled = Boolean.FALSE;
 
@@ -56,6 +57,11 @@ public class WebAppBridgeBuilder {
         return this;
     }
 
+    public WebAppBridgeBuilder javaScriptCanAccessClipboard(Boolean enabled){
+        javaScriptCanAccessClipboard = enabled;
+        return this;
+    }
+
     public WebAppBridgeBuilder developerExtrasEnabled(Boolean enabled){
         developerExtrasEnabled = enabled;
         return this;
@@ -81,6 +87,10 @@ public class WebAppBridgeBuilder {
         if( javaScriptCanCloseWindows ){
             bridge.setAttribute(QWebSettings.WebAttribute.JavascriptEnabled, true);
             bridge.setAttribute(QWebSettings.WebAttribute.JavascriptCanOpenWindows, true);
+        }
+        if( javaScriptCanCloseWindows ){
+            bridge.setAttribute(QWebSettings.WebAttribute.JavascriptEnabled, true);
+            bridge.setAttribute(QWebSettings.WebAttribute.JavascriptCanAccessClipboard, true);
         }
         if( developerExtrasEnabled ){
             bridge.setAttribute(QWebSettings.WebAttribute.DeveloperExtrasEnabled, true);
