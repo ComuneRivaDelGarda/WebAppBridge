@@ -1,6 +1,7 @@
 package it.tn.rivadelgarda.comune.gda;
 
 import com.trolltech.qt.core.QByteArray;
+import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QUrl;
 import com.trolltech.qt.gui.QFileDialog;
 import com.trolltech.qt.gui.QMessageBox;
@@ -123,14 +124,10 @@ public class WebView extends QWebView {
             fileName = split[split.length - 1];
         }
 
-        String folderPath=null;
-        if( downloadPath!=null ) {
-            folderPath = QFileDialog.getExistingDirectory(this, "Save file", downloadPath, QFileDialog.Option.ShowDirsOnly);
-        } else {
-            folderPath = QFileDialog.getExistingDirectory(this, "Save file", null, QFileDialog.Option.ShowDirsOnly);
-        }
-        if( folderPath!=null ) {
-            saveFile(folderPath + "/" + fileName, bytes);
+        String defaultSaveFileName = QDir.cleanPath(downloadPath + QDir.separator() + fileName);
+        String saveFileName = QFileDialog.getSaveFileName(this, "Save file", defaultSaveFileName);
+        if( saveFileName!=null ){
+            saveFile(saveFileName, bytes);
         } else {
             QMessageBox.critical(this, "Alert", "File not saved");
         }
