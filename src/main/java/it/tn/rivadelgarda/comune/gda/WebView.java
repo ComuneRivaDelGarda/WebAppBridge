@@ -3,9 +3,8 @@ package it.tn.rivadelgarda.comune.gda;
 import com.trolltech.qt.core.QByteArray;
 import com.trolltech.qt.core.QDir;
 import com.trolltech.qt.core.QUrl;
-import com.trolltech.qt.gui.QFileDialog;
-import com.trolltech.qt.gui.QMessageBox;
-import com.trolltech.qt.gui.QWidget;
+import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.gui.*;
 import com.trolltech.qt.network.QNetworkAccessManager;
 import com.trolltech.qt.network.QNetworkCookieJar;
 import com.trolltech.qt.network.QNetworkReply;
@@ -17,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+
 
 /**
  * Created by tiziano on 16/12/16.
@@ -63,6 +62,7 @@ public class WebView extends QWebView {
     }
 
     private void unsupportedContent(QNetworkReply reply){
+        QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
         reply.finished.connect(this, "downloadFileSlot()");
     }
 
@@ -70,9 +70,11 @@ public class WebView extends QWebView {
         QNetworkAccessManager manager = page().networkAccessManager();
         if( downloadContentTypes.length>0 ){
             QNetworkReply headerReply = manager.head(request);
+            QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
             headerReply.finished.connect(this, "checkHeaders()");
         } else {
             QNetworkReply reply = manager.get(request);
+            QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
             reply.finished.connect(this, "downloadFileSlot()");
         }
     }
@@ -81,10 +83,12 @@ public class WebView extends QWebView {
         QNetworkAccessManager manager = page().networkAccessManager();
         QNetworkRequest request = new QNetworkRequest(url);
         QNetworkReply headerReply = manager.head(request);
+        QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
         headerReply.finished.connect(this, "checkHeaders()");
     }
 
     private void checkHeaders(){
+        QApplication.restoreOverrideCursor();
         QNetworkReply headerReply = (QNetworkReply) signalSender();
         QUrl url = headerReply.url();
         String contentType = (String) headerReply.header(QNetworkRequest.KnownHeaders.ContentTypeHeader);
@@ -92,6 +96,7 @@ public class WebView extends QWebView {
             QNetworkAccessManager manager = headerReply.manager();
             QNetworkRequest request = new QNetworkRequest(url);
             QNetworkReply reply = manager.get(request);
+            QApplication.setOverrideCursor(new QCursor(Qt.CursorShape.WaitCursor));
             reply.finished.connect(this, "downloadFileSlot()");
         } else {
             setUrl(url);
@@ -99,6 +104,7 @@ public class WebView extends QWebView {
     }
 
     private void downloadFileSlot(){
+        QApplication.restoreOverrideCursor();
         QNetworkReply reply = (QNetworkReply) signalSender();
         downloadFile(reply);
     }
@@ -125,6 +131,7 @@ public class WebView extends QWebView {
         }
 
         String defaultSaveFileName = QDir.cleanPath(downloadPath + QDir.separator() + fileName);
+        System.out.println(defaultSaveFileName);
         String saveFileName = QFileDialog.getSaveFileName(this, "Save file", defaultSaveFileName);
         if( saveFileName!=null ){
             saveFile(saveFileName, bytes);
