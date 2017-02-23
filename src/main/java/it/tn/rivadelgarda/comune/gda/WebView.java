@@ -62,7 +62,7 @@ public class WebView extends QWebView {
     }
 
     private void unsupportedContent(QNetworkReply reply){
-        downloadFile(reply);
+        reply.finished.connect(this, "downloadFileSlot()");
     }
 
     private void downloadRequest(QNetworkRequest request){
