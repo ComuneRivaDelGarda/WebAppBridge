@@ -1,5 +1,6 @@
 package it.tn.rivadelgarda.comune.gda;
 
+import com.trolltech.qt.core.QByteArray;
 import com.trolltech.qt.core.QUrl;
 import com.trolltech.qt.gui.QFileDialog;
 import com.trolltech.qt.gui.QMessageBox;
@@ -15,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by tiziano on 16/12/16.
@@ -100,11 +102,27 @@ public class WebView extends QWebView {
         downloadFile(reply);
     }
 
-    private void downloadFile(QNetworkReply reply){
-        if( downloadContentTypes.length>0 ){
 
-        }
+    private void downloadFile(QNetworkReply reply){
+        //
         byte[] bytes = reply.readAll().toByteArray();
+
+        String fileName=null;
+        // filename: strategia uno: content-disposition
+        QByteArray contentDisposition = reply.rawHeader(new QByteArray("content-disposition"));
+        String[] split1 = contentDisposition.toString().split(";");
+        for( String tkn: split1 ){
+            String[] split = tkn.split("=");
+            if( "filename".equals(split[0]) ){
+                fileName = split[1].substring(1, split[1].length()-1);
+            }
+        }
+        // filename: strategia due: url
+        if( fileName==null ) {
+            String[] split = reply.url().toString().split("/");
+            fileName = split[split.length - 1];
+        }
+
         String folderPath=null;
         if( downloadPath!=null ) {
             folderPath = QFileDialog.getExistingDirectory(this, "Save file", downloadPath, QFileDialog.Option.ShowDirsOnly);
@@ -112,8 +130,6 @@ public class WebView extends QWebView {
             folderPath = QFileDialog.getExistingDirectory(this, "Save file", null, QFileDialog.Option.ShowDirsOnly);
         }
         if( folderPath!=null ) {
-            String[] split = reply.url().toString().split("/");
-            String fileName = split[split.length - 1];
             saveFile(folderPath + "/" + fileName, bytes);
         } else {
             QMessageBox.critical(this, "Alert", "File not saved");
@@ -124,6 +140,7 @@ public class WebView extends QWebView {
         try {
             FileOutputStream out = new FileOutputStream(fileName);
             out.write(content);
+            out.flush();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
