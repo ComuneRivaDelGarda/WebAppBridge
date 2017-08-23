@@ -150,12 +150,12 @@ public class WebView extends QWebView {
     }
 
     private void openFile(String fileName, byte[] content){
-        String name = fileName.substring(0, fileName.lastIndexOf('.'));
-        String ext = fileName.substring(fileName.lastIndexOf('.'));
-        QTemporaryFile tmpFile = new QTemporaryFile(QDir.tempPath() + QDir.separator() + name + ".XXXXXX" + ext);
+        QTemporaryFile tmpFile = new QTemporaryFile(QDir.tempPath() + QDir.separator() + "XXXXXX" + fileName);
         tmpFile.open(new QFile.OpenMode(QFile.OpenModeFlag.WriteOnly, QFile.OpenModeFlag.Unbuffered));
         tmpFile.write(content);
-        String xAppsName = tmpFile.fileName().substring(0, tmpFile.fileName().lastIndexOf('.')) + ".unlocked" + ext;
+        String path = tmpFile.fileName().substring(0, tmpFile.fileName().lastIndexOf(QDir.separator()));
+        String name = tmpFile.fileName().substring(tmpFile.fileName().lastIndexOf(QDir.separator())+1);
+        String xAppsName = path + QDir.separator() + "unlocked" + name;
         tmpFile.copy(xAppsName);
         tmpFile.close();
         QFile.remove(tmpFile.fileName());
