@@ -1,9 +1,6 @@
 package it.tn.rivadelgarda.comune.gda;
 
-import com.trolltech.qt.core.QByteArray;
-import com.trolltech.qt.core.QDir;
-import com.trolltech.qt.core.QUrl;
-import com.trolltech.qt.core.Qt;
+import com.trolltech.qt.core.*;
 import com.trolltech.qt.gui.*;
 import com.trolltech.qt.network.QNetworkAccessManager;
 import com.trolltech.qt.network.QNetworkCookieJar;
@@ -106,11 +103,20 @@ public class WebView extends QWebView {
     private void downloadFileSlot(){
         QApplication.restoreOverrideCursor();
         QNetworkReply reply = (QNetworkReply) signalSender();
-        downloadFile(reply);
+        // TODO: download or open
+        QMessageBox.StandardButtons buttons = new QMessageBox.StandardButtons();
+        buttons.set(QMessageBox.StandardButton.Save, QMessageBox.StandardButton.Open);
+        QMessageBox.StandardButton button = QMessageBox.question(this.parentWidget(), "Scarica o apri",
+                "Scegli se scaricare o aprire il file", buttons);
+        if( button == QMessageBox.StandardButton.Save ) {
+            downloadOrOpenFile(reply, Boolean.FALSE);
+        } else if( button == QMessageBox.StandardButton.Open ){
+            downloadOrOpenFile(reply, Boolean.TRUE);
+        }
     }
 
 
-    private void downloadFile(QNetworkReply reply){
+    private void downloadOrOpenFile(QNetworkReply reply, Boolean open){
         //
         byte[] bytes = reply.readAll().toByteArray();
 
@@ -130,14 +136,30 @@ public class WebView extends QWebView {
             fileName = split[split.length - 1];
         }
 
-        String defaultSaveFileName = QDir.cleanPath(downloadPath + QDir.separator() + fileName);
-        System.out.println(defaultSaveFileName);
-        String saveFileName = QFileDialog.getSaveFileName(this, "Save file", defaultSaveFileName);
-        if( saveFileName!=null ){
-            saveFile(saveFileName, bytes);
+        if( open ){
+            openFile(fileName, bytes);
         } else {
-            QMessageBox.critical(this, "Alert", "File not saved");
+            String defaultSaveFileName = QDir.cleanPath(downloadPath + QDir.separator() + fileName);
+            String filePath = QFileDialog.getSaveFileName(this, "Save file", defaultSaveFileName);
+            if( filePath!=null ){
+                saveFile(filePath, bytes);
+            } else {
+                QMessageBox.critical(this, "Alert", "File not saved");
+            }
         }
+    }
+
+    private void openFile(String fileName, byte[] content){
+        String name = fileName.substring(0, fileName.lastIndexOf('.'));
+        String ext = fileName.substring(fileName.lastIndexOf('.'));
+        QTemporaryFile tmpFile = new QTemporaryFile(QDir.tempPath() + QDir.separator() + name + ".XXXXXX" + ext);
+        tmpFile.open(new QFile.OpenMode(QFile.OpenModeFlag.WriteOnly, QFile.OpenModeFlag.Unbuffered));
+        tmpFile.write(content);
+        String xAppsName = tmpFile.fileName().substring(0, tmpFile.fileName().lastIndexOf('.')) + ".unlocked" + ext;
+        tmpFile.copy(xAppsName);
+        tmpFile.close();
+        QFile.remove(tmpFile.fileName());
+        QDesktopServices.openUrl(QUrl.fromLocalFile(xAppsName));
     }
 
     private void saveFile(String fileName, byte[] content) {
