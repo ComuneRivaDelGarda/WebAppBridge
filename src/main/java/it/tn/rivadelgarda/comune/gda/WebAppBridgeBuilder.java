@@ -1,5 +1,6 @@
 package it.tn.rivadelgarda.comune.gda;
 
+import com.trolltech.qt.gui.QWidget;
 import com.trolltech.qt.webkit.QWebSettings;
 
 /**
@@ -80,8 +81,12 @@ public class WebAppBridgeBuilder {
         return this;
     }
 
-    public WebAppBridge build(){
-        WebAppBridge bridge = new WebAppBridge();
+    public WebAppBridge build() {
+        return this.build(null);
+    }
+
+    public WebAppBridge build(QWidget parent){
+        WebAppBridge bridge = new WebAppBridge(parent);
         if( bridge!=null ){
             bridge.loadPage(url);
         }

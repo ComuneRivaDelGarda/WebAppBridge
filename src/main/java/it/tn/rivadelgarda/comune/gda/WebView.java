@@ -140,22 +140,22 @@ public class WebView extends QWebView {
             openFile(fileName, bytes);
         } else {
             String defaultSaveFileName = QDir.cleanPath(downloadPath + QDir.separator() + fileName);
-            String filePath = QFileDialog.getSaveFileName(this, "Save file", defaultSaveFileName);
-            if( filePath!=null ){
+            String filePath = QFileDialog.getSaveFileName(this, "Salva file", defaultSaveFileName);
+            if( filePath!=null && !"".equals(filePath.trim())){
                 saveFile(filePath, bytes);
             } else {
-                QMessageBox.critical(this, "Alert", "File not saved");
+                QMessageBox.critical(this, "Attenzione", "File non salvato");
             }
         }
     }
 
     private void openFile(String fileName, byte[] content){
-        QTemporaryFile tmpFile = new QTemporaryFile(QDir.tempPath() + QDir.separator() + "XXXXXX" + fileName);
+        QTemporaryFile tmpFile = new QTemporaryFile(QDir.tempPath() + "/XXXXXX_" + fileName);
         tmpFile.open(new QFile.OpenMode(QFile.OpenModeFlag.WriteOnly, QFile.OpenModeFlag.Unbuffered));
         tmpFile.write(content);
-        String path = tmpFile.fileName().substring(0, tmpFile.fileName().lastIndexOf(QDir.separator()));
-        String name = tmpFile.fileName().substring(tmpFile.fileName().lastIndexOf(QDir.separator())+1);
-        String xAppsName = path + QDir.separator() + "unlocked" + name;
+        QFileInfo file = new QFileInfo(tmpFile);
+        String xAppsName = file.dir().path() + "/u_" +  file.fileName();
+        System.err.print("xAppsName=" + xAppsName + "---\n");
         tmpFile.copy(xAppsName);
         tmpFile.close();
         QFile.remove(tmpFile.fileName());
